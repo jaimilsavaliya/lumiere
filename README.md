@@ -86,11 +86,12 @@ Lumiere/
 
 ---
 
-## 🎨 Design Philosophy
+## 🎨 Design & Typography
 
-Lumiere is built on the principle of **Visual Excellence**. We avoid generic defaults in favor of:
-- **Curated Color Palettes**: Sleek dark modes with primary accents.
-- **Modern Typography**: Using high-quality variable fonts for readability and style.
+Lumiere is built on the principle of **Visual Excellence**, utilizing a modern tech stack and premium design tokens:
+- **Geist Variable**: Used for main headings and interactive elements for a technical, precise feel.
+- **Manrope**: Used for body text and descriptions, providing excellent readability with a modern touch.
+- **Curated Color Palettes**: Sleek dark modes with primary accents and high-contrast meta-information.
 - **Interactive Depth**: Using shadows, blurs, and scale effects to make the interface feel "alive".
 
 ---
