@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import Autoplay from "embla-carousel-autoplay"
-import { LucidePlay, LucideStar } from "lucide-react"
+import { LucidePlay, LucideStar, LucideCalendar, LucideInfo } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { useTmdb } from "@/components/providers/tmdb-provider"
@@ -136,22 +136,42 @@ export function Hero() {
 
                                                 <p className="line-clamp-4 text-sm text-white/90">{movie.overview}</p>
 
-                                                <div className="mb-3 flex items-center gap-4 text-sm text-white/90">
-                                                    <span>{movie.release_date ? new Date(movie.release_date).toLocaleDateString() : "Unknown"}</span>
-                                                    <div className="flex items-center gap-1 text-yellow-400">
-                                                        <LucideStar />
-                                                        {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"}
-                                                    </div>
+                                                {/* Meta pills */}
+                                                <div className="mb-4 flex flex-wrap items-center gap-2">
+                                                    {movie.release_date && (
+                                                        <span className="flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-sm">
+                                                            <LucideCalendar className="size-3" />
+                                                            {new Date(movie.release_date).getFullYear()}
+                                                        </span>
+                                                    )}
+                                                    {movie.vote_average ? (
+                                                        <span className="flex items-center gap-1.5 rounded-full bg-yellow-400/20 px-3 py-1 text-xs font-semibold text-yellow-300 ring-1 ring-yellow-400/30">
+                                                            <LucideStar className="size-3 fill-yellow-300" />
+                                                            {movie.vote_average.toFixed(1)}
+                                                        </span>
+                                                    ) : null}
                                                 </div>
 
-                                                <Button
-                                                    variant="outline"
-                                                    className="bg-white/70 backdrop-blur-sm"
-                                                    onClick={() => navigate(`/movie/${movie.id}`)}
-                                                >
-                                                    <LucidePlay className="mr-2 h-4 w-4" />
-                                                    Watch
-                                                </Button>
+                                                {/* CTA buttons */}
+                                                <div className="flex items-center gap-3">
+                                                    <button
+                                                        onClick={() => navigate(`/movie/${movie.id}`)}
+                                                        className="group relative flex items-center gap-2 overflow-hidden rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/40 transition-all duration-300 hover:shadow-primary/60 hover:scale-[1.03] active:scale-[0.98]"
+                                                    >
+                                                        {/* Shine sweep on hover */}
+                                                        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-500 group-hover:translate-x-full" />
+                                                        <LucidePlay className="size-4 fill-current" />
+                                                        Watch Now
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() => navigate(`/movie/${movie.id}`)}
+                                                        className="flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-5 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/20"
+                                                    >
+                                                        <LucideInfo className="size-4" />
+                                                        More Info
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             {/* Poster */}

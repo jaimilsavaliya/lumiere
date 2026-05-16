@@ -161,28 +161,117 @@ export default function Discover() {
 
     return (
         <section className="space-y-8 pb-8">
-            {/* Hero Section */}
-            <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-background to-accent/10 p-6 md:p-10"
+            {/* Hero Section — Cinematic Banner */}
+            <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                className="relative isolate overflow-hidden rounded-2xl bg-zinc-950 min-h-[220px]"
             >
-                <div className="relative z-10">
-                    <div className="mb-2 flex items-center gap-2 text-primary">
-                        <Compass className="h-6 w-6" />
-                        <span className="text-sm font-semibold uppercase tracking-wider">Discover</span>
+                {/* ── Ambient background: blurred poster mosaic ── */}
+                {trendingMovies.length > 0 && (
+                    <div className="pointer-events-none absolute inset-0 flex overflow-hidden opacity-30">
+                        {trendingMovies.slice(0, 6).map((m, i) => (
+                            <div
+                                key={m.id}
+                                className="min-w-0 flex-1 bg-cover bg-center"
+                                style={{ backgroundImage: `url(https://image.tmdb.org/t/p/w500${m.backdrop_path})` }}
+                            />
+                        ))}
+                        {/* Hard vignette so text is always readable */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-zinc-950/60" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950/60" />
                     </div>
-                    <h1 className="mb-2 text-3xl font-bold md:text-4xl">
-                        Find Your Next Favorite
-                    </h1>
-                    <p className="max-w-lg text-muted-foreground">
-                        Explore movies by genre, sort by popularity, ratings, or release date. Your next binge-worthy pick is just a click away.
-                    </p>
+                )}
+
+                {/* ── Floating poster strip — right side ── */}
+                {trendingMovies.length >= 4 && (
+                    <div className="pointer-events-none absolute right-0 top-0 hidden h-full w-64 md:flex items-center justify-end pr-4 gap-3">
+                        {[
+                            { movie: trendingMovies[0], rotate: "-rotate-6", translate: "-translate-y-4", delay: 0 },
+                            { movie: trendingMovies[1], rotate: "rotate-2",  translate: "translate-y-2",  delay: 0.08 },
+                            { movie: trendingMovies[2], rotate: "-rotate-3", translate: "-translate-y-2", delay: 0.16 },
+                            { movie: trendingMovies[3], rotate: "rotate-5",  translate: "translate-y-4",  delay: 0.24 },
+                        ].map(({ movie, rotate, translate, delay }) => (
+                            <motion.img
+                                key={movie.id}
+                                src={`https://image.tmdb.org/t/p/w185${movie.poster_path}`}
+                                alt={movie.title}
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+                                className={`h-36 w-24 rounded-xl object-cover shadow-2xl ring-1 ring-white/10 ${rotate} ${translate}`}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {/* ── Text content ── */}
+                <div className="relative z-10 flex flex-col justify-center gap-4 p-7 md:p-10 md:pr-72">
+                    {/* Label */}
+                    <motion.div
+                        initial={{ opacity: 0, x: -16 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                        className="flex items-center gap-2"
+                    >
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 ring-1 ring-primary/40">
+                            <Compass className="h-3.5 w-3.5 text-primary" />
+                        </span>
+                        <span className="text-xs font-semibold uppercase tracking-widest text-primary/80">Discover</span>
+                    </motion.div>
+
+                    {/* Headline */}
+                    <motion.h1
+                        initial={{ opacity: 0, x: -24 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6, delay: 0.18 }}
+                        className="text-3xl font-extrabold leading-tight tracking-tight text-white md:text-4xl"
+                    >
+                        Your next favourite<br />
+                        <span className="bg-gradient-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent">
+                            film is one click away.
+                        </span>
+                    </motion.h1>
+
+                    {/* Sub-text */}
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                        className="max-w-sm text-sm leading-relaxed text-white/50"
+                    >
+                        Browse thousands of movies by genre, sort by ratings, box office, or release date — all in one place.
+                    </motion.p>
+
+                    {/* Quick genre chips */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.4 }}
+                        className="flex flex-wrap gap-2"
+                    >
+                        {GENRE_LIST.slice(0, 7).map((g) => (
+                            <button
+                                key={g.id}
+                                onClick={() => handleGenreClick(g.id)}
+                                className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200
+                                    ${selectedGenre === g.id
+                                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/30"
+                                        : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
+                                    }`}
+                            >
+                                {g.name}
+                            </button>
+                        ))}
+                        <button
+                            onClick={() => setSelectedGenre(null)}
+                            className="rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-white/40 hover:bg-white/10 hover:text-white/70 transition-all"
+                        >
+                            + more
+                        </button>
+                    </motion.div>
                 </div>
-                {/* Decorative blobs */}
-                <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-                <div className="pointer-events-none absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-accent/10 blur-3xl" />
             </motion.div>
 
             {/* Trending This Week */}
