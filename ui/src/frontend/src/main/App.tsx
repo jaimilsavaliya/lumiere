@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/sonner"
-import { BrowserRouter, Route, Routes } from "react-router-dom"
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom"
 import Home from "@/pages/home/Home"
 import NotFound from "@/pages/404/NotFound"
 import { SidebarInset } from "@/components/ui/sidebar"
@@ -12,11 +12,34 @@ import Shows from "@/pages/shows/Shows.tsx"
 import MoviePage from "@/pages/watch/MoviePage.tsx"
 import TVPage from "@/pages/watch/TVPage.tsx"
 import Discover from "@/pages/discover/Discover.tsx"
+import CategoryPage from "@/pages/category/CategoryPage.tsx"
+import { AnimatePresence } from "framer-motion"
+import PageTransition from "@/components/global/PageTransition"
+
+function AnimatedRoutes() {
+    const location = useLocation()
+
+    return (
+        <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+                <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+                <Route path="/discover" element={<PageTransition><Discover /></PageTransition>} />
+                <Route path="/movies" element={<PageTransition><Movies /></PageTransition>} />
+                <Route path="/shows" element={<PageTransition><Shows /></PageTransition>} />
+                <Route path="/explore/:type/:category" element={<PageTransition><CategoryPage /></PageTransition>} />
+                <Route path="/movie/:id" element={<PageTransition><MoviePage /></PageTransition>} />
+                <Route path="/tv/:id" element={<PageTransition><TVPage /></PageTransition>} />
+                <Route path="/show/:id" element={<PageTransition><TVPage /></PageTransition>} />
+                <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+            </Routes>
+        </AnimatePresence>
+    )
+}
 
 export function App() {
     return (
         <BrowserRouter>
-            <div className="flex min-h-screen w-full bg-sidebar text-foreground">
+            <div className="flex min-h-screen w-full bg-sidebar text-foreground font-sans">
                 {/* Sidebar */}
                 <SideBar />
 
@@ -49,16 +72,7 @@ export function App() {
                                 maxWidth: "93vw",
                             }}
                         >
-                            <Routes>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/discover" element={<Discover />} />
-                                <Route path="/movies" element={<Movies />} />
-                                <Route path="/shows" element={<Shows />} />
-                                <Route path="/movie/:id" element={<MoviePage />} />
-                                <Route path="/tv/:id" element={<TVPage />} />
-                                <Route path="/show/:id" element={<TVPage />} />
-                                <Route path="*" element={<NotFound />} />
-                            </Routes>
+                            <AnimatedRoutes />
                         </main>
                         {/* Footer */}
                         <Footer />

@@ -123,11 +123,11 @@ export default function Movies() {
 
     return (
         <section className="space-y-8">
-            <MovieCarousel loading={loading} title="Popular Movies" movies={popularMovies} />
-            <MovieCarousel loading={loading} title="Top Rated Movies" movies={topRatedMovies} />
+            <MovieCarousel loading={loading} title="Popular Movies" movies={popularMovies} viewAllLink="/explore/movie/popular" />
+            <MovieCarousel loading={loading} title="Top Rated Movies" movies={topRatedMovies} viewAllLink="/explore/movie/top_rated" />
 
             {GENRES.map((genre) => (
-                <MovieCarousel key={genre.id} loading={loading} title={`${genre.name} Movies`} movies={genreMovies[genre.id] || []} />
+                <MovieCarousel key={genre.id} loading={loading} title={`${genre.name} Movies`} movies={genreMovies[genre.id] || []} viewAllLink={`/explore/movie/genre?genre=${genre.id}&name=${genre.name}`} />
             ))}
         </section>
     )

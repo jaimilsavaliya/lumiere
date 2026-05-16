@@ -2,43 +2,63 @@ import type { MovieResultItem } from "@lorenzopant/tmdb"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel.tsx"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card.tsx"
 import { Button } from "@/components/ui/button.tsx"
-import { LucidePlay, LucideStar } from "lucide-react"
+import { LucideChevronRight, LucidePlay, LucideStar, LucideCalendar, LucideGlobe } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton.tsx"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
+import { motion } from "framer-motion"
 
-export default function MovieCarousel({ title, movies, loading }: { title: string; movies: MovieResultItem[], loading: boolean }) {
+export default function MovieCarousel({ title, movies, loading, viewAllLink }: { title: string; movies: MovieResultItem[], loading: boolean, viewAllLink?: string }) {
     return (
         <section className="my-8">
-            <h2 className="mb-4 text-2xl font-bold">{title}</h2>
+            <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-2xl font-bold">{title}</h2>
+                <Button variant="ghost" size="sm" className="group/link flex items-center gap-1 text-muted-foreground hover:text-primary" asChild>
+                    <Link to={viewAllLink || "/discover"}>
+                        View All
+                        <LucideChevronRight className="h-4 w-4 transition-transform group-hover/link:translate-x-1" />
+                    </Link>
+                </Button>
+            </div>
 
-            <Carousel opts={{ skipSnaps: true, dragFree: true }} className="h-full w-full">
+            <Carousel opts={{ skipSnaps: true, dragFree: true }} className="group/carousel h-full w-full">
                 <CarouselContent className="h-full w-full px-3">
                     {loading &&
-                        Array.from({ length: 20 }).map((_, idx) => (
-                            <CarouselItem key={idx} className={"h-full w-full p-2 md:basis-1/10 lg:basis-1/8"}>
-                                <Skeleton className="h-40 w-28 rounded-2xl" />
+                        Array.from({ length: 10 }).map((_, idx) => (
+                            <CarouselItem key={idx} className={"h-full p-2 md:basis-1/10 lg:basis-1/8"}>
+                                <Skeleton className="h-40 w-full rounded-2xl" />
                             </CarouselItem>
                         ))}
                     {!loading &&
                         movies.map((movie, idx) => (
-                            <CarouselItem key={idx} className="h-full w-full p-2 md:basis-1/10 lg:basis-1/8">
-                                <HoverCard openDelay={250} closeDelay={300}>
-                                    <HoverCardTrigger>
-                                        <MovieCardTrigger movie={movie} />
-                                    </HoverCardTrigger>
-                                    <HoverCardContent
-                                        side="right"
-                                        className="smoothie rings-1 rings-white/5 m-0 flex flex-col gap-2 overflow-hidden rounded-xl bg-black/80 p-0 ring-[1px] ring-slate-500/20 backdrop-blur select-none!"
-                                    >
-                                        <MovieCardContent movie={movie} />
-                                    </HoverCardContent>
-                                </HoverCard>
+                            <CarouselItem key={idx} className="h-full p-2 md:basis-1/10 lg:basis-1/8">
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ 
+                                        duration: 0.4, 
+                                        delay: idx * 0.03,
+                                        ease: [0.23, 1, 0.32, 1]
+                                    }}
+                                    whileHover={{ scale: 1.05, y: -5 }}
+                                >
+                                    <HoverCard openDelay={250} closeDelay={300}>
+                                        <HoverCardTrigger>
+                                            <MovieCardTrigger movie={movie} />
+                                        </HoverCardTrigger>
+                                        <HoverCardContent
+                                            side="right"
+                                            className="m-0 w-72 overflow-hidden rounded-2xl border-0 bg-transparent p-0 shadow-2xl select-none!"
+                                        >
+                                            <MovieCardContent movie={movie} />
+                                        </HoverCardContent>
+                                    </HoverCard>
+                                </motion.div>
                             </CarouselItem>
                         ))}
                 </CarouselContent>
 
-                <CarouselPrevious style={{ marginLeft: "50px" }} />
-                <CarouselNext style={{ marginRight: "50px" }} />
+                <CarouselPrevious />
+                <CarouselNext />
             </Carousel>
         </section>
     )
@@ -50,63 +70,70 @@ export function MovieCardTrigger({ movie }: { movie: MovieResultItem }) {
     return <img src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`} alt={alt} className="h-full w-full rounded-2xl object-cover" width={300} height={169} />
 }
 
-// HoverCard content component with skeleton fallback
+// HoverCard content component — redesigned
 export function MovieCardContent({ movie }: { movie: MovieResultItem }) {
     const backdrop = movie.backdrop_path
-    const imgSrc = backdrop ? `https://image.tmdb.org/t/p/original${backdrop}` : null
+    const imgSrc = backdrop ? `https://image.tmdb.org/t/p/w780${backdrop}` : null
     const title = movie.title || "No Title"
     const overviewFull = movie.overview
-    const overview = overviewFull ? (overviewFull.length > 100 ? overviewFull.slice(0, 100) + "..." : overviewFull) : "No overview available."
+    const overview = overviewFull ? (overviewFull.length > 120 ? overviewFull.slice(0, 120) + "…" : overviewFull) : "No overview available."
     const rating = movie.vote_average ?? null
-    const date = movie.release_date || "Unknown"
+    const year = movie.release_date ? new Date(movie.release_date).getFullYear() : null
     const lang = movie.original_language?.toUpperCase() || "—"
     const id = movie.id
 
     const navigate = useNavigate()
 
     return (
-        <div>
-            {/* Image / Poster */}
-            <div className="relative flex aspect-2/1 w-full overflow-hidden rounded-xl bg-white/5">
-                {imgSrc ? <img src={imgSrc} alt={title} className="h-full w-full object-cover object-center select-none!" /> : <Skeleton className="h-full w-full" />}
+        <div className="relative overflow-hidden rounded-2xl bg-zinc-950">
+            {/* Backdrop with gradient overlay */}
+            <div className="relative aspect-[16/9] w-full overflow-hidden">
+                {imgSrc
+                    ? <img src={imgSrc} alt={title} className="h-full w-full object-cover object-center" />
+                    : <div className="h-full w-full bg-zinc-800" />
+                }
+                {/* Dark gradient from bottom */}
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
 
-                {/* Rating Badge */}
+                {/* Rating pill — top right */}
                 {rating !== null && (
-                    <span className="text-gold absolute top-1 right-1 flex items-center gap-1 rounded-md bg-black/75 p-1 text-xs">
-                        <LucideStar size={13} />
+                    <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-xs font-semibold text-yellow-400 backdrop-blur-sm ring-1 ring-yellow-400/20">
+                        <LucideStar className="size-3 fill-yellow-400" />
                         {Number(rating).toFixed(1)}
-                    </span>
+                    </div>
                 )}
             </div>
 
-            {/* Content */}
-            <div className="flex flex-col gap-2 p-4 pt-2">
-                <div className="flex flex-col items-start gap-1">
-                    <span className="line-clamp-2! leading-tight! font-medium tracking-wider text-pretty">{title || <Skeleton className="h-4 w-24" />}</span>
-                    <span className="line-clamp-3! text-xs leading-tight! text-gray-400">{overview || <Skeleton className="h-3 w-full" />}</span>
+            {/* Text content sits below the backdrop */}
+            <div className="flex flex-col gap-3 px-4 pb-4 pt-2">
+                {/* Title */}
+                <h3 className="line-clamp-2 text-sm font-bold leading-snug text-white">{title}</h3>
+
+                {/* Meta badges */}
+                <div className="flex flex-wrap items-center gap-1.5">
+                    {year && (
+                        <span className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-medium text-white/70">
+                            <LucideCalendar className="size-2.5" />
+                            {year}
+                        </span>
+                    )}
+                    <span className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-medium text-white/70">
+                        <LucideGlobe className="size-2.5" />
+                        {lang}
+                    </span>
                 </div>
 
-                <div className="flex flex-col gap-[0.1rem] text-[.8rem]">
-                    <div className="flex items-center gap-1">
-                        <span className="tracking-wider! text-gray-400">Date:</span>
-                        <span className="text-xs tracking-wider! text-gray-300">{date || <Skeleton className="h-3 w-12" />}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <span className="tracking-wider! text-gray-400">Lang:</span>
-                        <span className="text-xs tracking-wider! text-gray-300">{lang || <Skeleton className="h-3 w-6" />}</span>
-                    </div>
-                </div>
+                {/* Overview */}
+                <p className="line-clamp-3 text-[11px] leading-relaxed text-white/55">{overview}</p>
 
-                <div className="mt-2 flex gap-x-2 text-sm font-medium">
-                    <Button
-                        variant="outline"
-                        className="flex flex-grow items-center justify-center gap-2 overflow-hidden p-2 px-4 !select-none"
-                        onClick={() => (navigate("/movie/" + id))}
-                    >
-                        <LucidePlay className="h-4 w-4" />
-                        Watch Now!
-                    </Button>
-                </div>
+                {/* CTA */}
+                <Button
+                    className="mt-1 w-full rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90"
+                    onClick={() => navigate("/movie/" + id)}
+                >
+                    <LucidePlay className="mr-1.5 size-4 fill-current" />
+                    Watch Now
+                </Button>
             </div>
         </div>
     )

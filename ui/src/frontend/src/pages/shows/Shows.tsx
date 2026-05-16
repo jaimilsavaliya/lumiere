@@ -34,8 +34,8 @@ export default function Shows() {
 
     return (
         <section className="space-y-6">
-            <TVCarousel loading={loading} title="Popular TV Shows" shows={popularShows} />
-            <TVCarousel loading={loading} title="Top Rated TV Shows" shows={topRatedShows} />
+            <TVCarousel loading={loading} title="Popular TV Shows" shows={popularShows} viewAllLink="/explore/tv/popular" />
+            <TVCarousel loading={loading} title="Top Rated TV Shows" shows={topRatedShows} viewAllLink="/explore/tv/top_rated" />
         </section>
     )
 }

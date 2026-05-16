@@ -51,11 +51,11 @@ export default function Home() {
         <section className="space-y-6">
             <Hero />
 
-            <MovieCarousel loading={loading} title="Popular Movies" movies={popularMovies} />
-            <MovieCarousel loading={loading} title="Top Rated Movies" movies={topRatedMovies} />
+            <MovieCarousel loading={loading} title="Popular Movies" movies={popularMovies} viewAllLink="/explore/movie/popular" />
+            <MovieCarousel loading={loading} title="Top Rated Movies" movies={topRatedMovies} viewAllLink="/explore/movie/top_rated" />
 
-            <TVCarousel loading={loading} title="Popular TV Shows" shows={popularShows} />
-            <TVCarousel loading={loading} title="Top Rated TV Shows" shows={topRatedShows} />
+            <TVCarousel loading={loading} title="Popular TV Shows" shows={popularShows} viewAllLink="/explore/tv/popular" />
+            <TVCarousel loading={loading} title="Top Rated TV Shows" shows={topRatedShows} viewAllLink="/explore/tv/top_rated" />
         </section>
     )
 }

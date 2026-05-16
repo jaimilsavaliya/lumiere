@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider"
 import AppProviders from "@/main/AppProviders.tsx"
 
 createRoot(document.getElementById("root")!).render(
-    <ThemeProvider defaultTheme="dark">
+    <ThemeProvider defaultTheme="system">
         <AppProviders>
             <App />
         </AppProviders>

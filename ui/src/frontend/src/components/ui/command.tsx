@@ -29,7 +29,7 @@ function CommandDialog({
                 <DialogTitle>{title}</DialogTitle>
                 <DialogDescription>{description}</DialogDescription>
             </DialogHeader>
-            <DialogContent className={cn("top-1/3 translate-y-0 overflow-hidden rounded-xl! p-0", className)} showCloseButton={showCloseButton}>
+            <DialogContent className={cn("top-[15%] translate-y-0 flex flex-col overflow-hidden rounded-xl! p-0 max-h-[70vh]", className)} showCloseButton={showCloseButton}>
                 {children}
             </DialogContent>
         </Dialog>
@@ -50,7 +50,7 @@ function CommandInput({ className, ...props }: React.ComponentProps<typeof Comma
 }
 
 function CommandList({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.List>) {
-    return <CommandPrimitive.List data-slot="command-list" className={cn("no-scrollbar max-h-72 scroll-py-1 overflow-x-hidden overflow-y-auto outline-none", className)} {...props} />
+    return <CommandPrimitive.List data-slot="command-list" className={cn("max-h-[55vh] flex-1 scroll-py-1 overflow-x-hidden overflow-y-auto overscroll-contain outline-none", className)} {...props} />
 }
 
 function CommandEmpty({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Empty>) {

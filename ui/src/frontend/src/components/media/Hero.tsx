@@ -134,7 +134,6 @@ export function Hero() {
                                                     <h1 className="mb-4 text-4xl font-bold">{movie.title}</h1>
                                                 )}
 
-
                                                 <p className="line-clamp-4 text-sm text-white/90">{movie.overview}</p>
 
                                                 <div className="mb-3 flex items-center gap-4 text-sm text-white/90">
