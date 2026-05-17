@@ -139,19 +139,37 @@
 }
 
 * {
-    scrollbar-color: var(--color-primary) var(--color-secondary);
+    scrollbar-color: var(--color-muted-foreground) transparent;
     scrollbar-width: thin;
     scroll-behavior: smooth;
 }
 *::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
 *::-webkit-scrollbar-track {
-    background: var(--color-secondary);
+    background: transparent;
 }
 *::-webkit-scrollbar-thumb {
-    background-color: var(--color-primary);
-    border-radius: 4px;
-    border: 2px solid var(--color-secondary);
+    background-color: var(--color-border);
+    border-radius: 10px;
+}
+*::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-muted-foreground);
+}
+
+/* Artplayer overrides */
+.artplayer-app .art-loading,
+.artplayer-app .art-icon-loading,
+.artplayer-app .art-layer-loading {
+    z-index: 10 !important;
+    pointer-events: none !important;
+}
+.artplayer-app .art-settings,
+.artplayer-app .art-setting,
+.artplayer-app .art-setting-panel,
+.artplayer-app .art-contextmenu,
+.artplayer-app .art-bottom,
+.artplayer-app .art-controls {
+    z-index: 90 !important;
 }

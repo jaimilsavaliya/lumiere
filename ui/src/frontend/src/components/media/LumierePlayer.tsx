@@ -204,7 +204,7 @@ export default function LumierePlayer({ sources, subtitles }: LumierePlayerProps
     }
 
     return (
-        <div className="group relative">
+        <div className="group relative" data-lenis-prevent="true">
             <div 
                 ref={artRef} 
                 className="aspect-video w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10"

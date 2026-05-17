@@ -112,7 +112,7 @@ export default function MathCurveLoader() {
     }, []);
 
     return (
-        <div className="math-curve-loader-container" style={{ width: '120px', height: '120px', color: '#F59E0B' }}>
+        <div className="math-curve-loader-container pointer-events-none" style={{ width: '120px', height: '120px', color: '#F59E0B', pointerEvents: 'none', zIndex: 10 }}>
             <svg viewBox="0 0 100 100" fill="none" aria-hidden="true" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                 <g ref={groupRef} style={{ filter: 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.4))' }}>
                     <path ref={pathRef} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" opacity="0.03" />

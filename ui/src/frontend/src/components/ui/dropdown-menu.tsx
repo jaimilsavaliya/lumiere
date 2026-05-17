@@ -23,6 +23,7 @@ function DropdownMenuContent({ className, align = "start", sideOffset = 4, ...pr
         <DropdownMenuPrimitive.Portal>
             <DropdownMenuPrimitive.Content
                 data-slot="dropdown-menu-content"
+                data-lenis-prevent="true"
                 sideOffset={sideOffset}
                 align={align}
                 className={cn(
