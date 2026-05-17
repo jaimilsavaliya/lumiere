@@ -13,6 +13,7 @@ import MoviePage from "@/pages/watch/MoviePage.tsx"
 import TVPage from "@/pages/watch/TVPage.tsx"
 import Discover from "@/pages/discover/Discover.tsx"
 import CategoryPage from "@/pages/category/CategoryPage.tsx"
+import ProviderPage from "@/pages/provider/ProviderPage.tsx"
 import { AnimatePresence } from "framer-motion"
 import PageTransition from "@/components/global/PageTransition"
 
@@ -27,6 +28,7 @@ function AnimatedRoutes() {
                 <Route path="/movies" element={<PageTransition><Movies /></PageTransition>} />
                 <Route path="/shows" element={<PageTransition><Shows /></PageTransition>} />
                 <Route path="/explore/:type/:category" element={<PageTransition><CategoryPage /></PageTransition>} />
+                <Route path="/provider/:id" element={<PageTransition><ProviderPage /></PageTransition>} />
                 <Route path="/movie/:id" element={<PageTransition><MoviePage /></PageTransition>} />
                 <Route path="/tv/:id" element={<PageTransition><TVPage /></PageTransition>} />
                 <Route path="/show/:id" element={<PageTransition><TVPage /></PageTransition>} />

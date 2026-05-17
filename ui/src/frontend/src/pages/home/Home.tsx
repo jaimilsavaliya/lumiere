@@ -1,6 +1,7 @@
 import { Hero } from "@/components/media/Hero.tsx"
 import MovieCarousel from "@/components/media/MovieCarousel"
 import TVCarousel from "@/components/media/TvCarousel.tsx"
+import OTTPlatforms from "@/components/media/OTTPlatforms.tsx"
 import { useEffect, useState } from "react"
 import type { MovieResultItem, TVSeriesResultItem } from "@lorenzopant/tmdb"
 import { useTmdb } from "@/components/providers/tmdb-provider"
@@ -50,6 +51,8 @@ export default function Home() {
     return (
         <section className="space-y-6">
             <Hero />
+
+            <OTTPlatforms />
 
             <MovieCarousel loading={loading} title="Popular Movies" movies={popularMovies} viewAllLink="/explore/movie/popular" />
             <MovieCarousel loading={loading} title="Top Rated Movies" movies={topRatedMovies} viewAllLink="/explore/movie/top_rated" />

@@ -11,7 +11,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Compass, TrendingUp, Star, Sparkles, Clock, Filter, LucideSlidersHorizontal, X, Loader2 } from "lucide-react"
+import { Compass, TrendingUp, Star, Sparkles, Clock, Filter, LucideSlidersHorizontal, X, Loader2, Tv, Globe, Languages } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -48,6 +48,47 @@ const GENRE_LIST = [
     { id: 37, name: "Western" },
 ]
 
+const WATCH_PROVIDERS = [
+    { id: 8, name: "Netflix" },
+    { id: 9, name: "Amazon Prime Video" },
+    { id: 337, name: "Disney+" },
+    { id: 350, name: "Apple TV+" },
+    { id: 15, name: "Hulu" },
+    { id: 1899, name: "Max" },
+    { id: 531, name: "Paramount+" },
+    { id: 384, name: "Peacock" },
+    { id: 283, name: "Crunchyroll" },
+]
+
+const LANGUAGES = [
+    { code: "en", name: "English" },
+    { code: "hi", name: "Hindi" },
+    { code: "es", name: "Spanish" },
+    { code: "fr", name: "French" },
+    { code: "ja", name: "Japanese" },
+    { code: "ko", name: "Korean" },
+    { code: "de", name: "German" },
+    { code: "it", name: "Italian" },
+    { code: "zh", name: "Chinese" },
+    { code: "ar", name: "Arabic" },
+    { code: "pt", name: "Portuguese" },
+    { code: "ru", name: "Russian" },
+    { code: "nl", name: "Dutch" },
+    { code: "tl", name: "Tagalog" },
+    { code: "vi", name: "Vietnamese" },
+]
+
+const REGIONS = [
+    { code: "US", name: "United States" },
+    { code: "IN", name: "India" },
+    { code: "GB", name: "United Kingdom" },
+    { code: "KR", name: "South Korea" },
+    { code: "JP", name: "Japan" },
+    { code: "FR", name: "France" },
+    { code: "CA", name: "Canada" },
+    { code: "AU", name: "Australia" },
+]
+
 type SortOption = "popularity.desc" | "vote_average.desc" | "primary_release_date.desc" | "revenue.desc"
 
 export default function Discover() {
@@ -56,9 +97,15 @@ export default function Discover() {
     const [searchParams, setSearchParams] = useSearchParams()
 
     const initialGenre = searchParams.get("genre") ? Number(searchParams.get("genre")) : null
+    const initialProvider = searchParams.get("provider") ? Number(searchParams.get("provider")) : null
+    const initialLanguage = searchParams.get("language") || null
+    const initialRegion = searchParams.get("region") || null
     const initialSort = (searchParams.get("sort") as SortOption) || "popularity.desc"
 
     const [selectedGenre, setSelectedGenre] = useState<number | null>(initialGenre)
+    const [selectedProvider, setSelectedProvider] = useState<number | null>(initialProvider)
+    const [selectedLanguage, setSelectedLanguage] = useState<string | null>(initialLanguage)
+    const [selectedRegion, setSelectedRegion] = useState<string | null>(initialRegion)
     const [sortBy, setSortBy] = useState<SortOption>(initialSort)
     const [movies, setMovies] = useState<MovieResultItem[]>([])
     const [trendingMovies, setTrendingMovies] = useState<MovieResultItem[]>([])
@@ -68,13 +115,15 @@ export default function Discover() {
 
     const sentinelRef = useRef<HTMLDivElement>(null)
 
-    // Update URL when filters change
     useEffect(() => {
         const params: any = {}
         if (selectedGenre) params.genre = selectedGenre
+        if (selectedProvider) params.provider = selectedProvider
+        if (selectedLanguage) params.language = selectedLanguage
+        if (selectedRegion) params.region = selectedRegion
         if (sortBy !== "popularity.desc") params.sort = sortBy
         setSearchParams(params, { replace: true })
-    }, [selectedGenre, sortBy, setSearchParams])
+    }, [selectedGenre, selectedProvider, selectedLanguage, selectedRegion, sortBy, setSearchParams])
 
     const sortOptions: { value: SortOption; label: string; icon: React.ReactNode }[] = [
         { value: "popularity.desc", label: "Trending", icon: <TrendingUp className="h-4 w-4" /> },
@@ -109,9 +158,19 @@ export default function Discover() {
             if (selectedGenre) {
                 params.with_genres = selectedGenre
             }
+            if (selectedProvider) {
+                params.with_watch_providers = selectedProvider
+                params.watch_region = "US"
+            }
+            if (selectedLanguage) {
+                params.with_original_language = selectedLanguage
+            }
+            if (selectedRegion) {
+                params.with_origin_country = selectedRegion
+            }
             const res = await tmdb.discover.movie(params)
             const newItems = res.results || []
-            
+
             if (pageNum === 1) {
                 setMovies(newItems)
             } else {
@@ -123,7 +182,7 @@ export default function Discover() {
         } finally {
             setLoading(false)
         }
-    }, [tmdb, sortBy, selectedGenre])
+    }, [tmdb, sortBy, selectedGenre, selectedProvider, selectedLanguage, selectedRegion])
 
     // Reset and fetch when filters change
     useEffect(() => {
@@ -131,7 +190,7 @@ export default function Discover() {
         setMovies([])
         setHasMore(true)
         fetchDiscover(1)
-    }, [sortBy, selectedGenre, fetchDiscover])
+    }, [sortBy, selectedGenre, selectedProvider, selectedLanguage, selectedRegion, fetchDiscover])
 
     // Infinite scroll observer
     useEffect(() => {
@@ -189,9 +248,9 @@ export default function Discover() {
                     <div className="pointer-events-none absolute right-0 top-0 hidden h-full w-64 md:flex items-center justify-end pr-4 gap-3">
                         {[
                             { movie: trendingMovies[0], rotate: "-rotate-6", translate: "-translate-y-4", delay: 0 },
-                            { movie: trendingMovies[1], rotate: "rotate-2",  translate: "translate-y-2",  delay: 0.08 },
+                            { movie: trendingMovies[1], rotate: "rotate-2", translate: "translate-y-2", delay: 0.08 },
                             { movie: trendingMovies[2], rotate: "-rotate-3", translate: "-translate-y-2", delay: 0.16 },
-                            { movie: trendingMovies[3], rotate: "rotate-5",  translate: "translate-y-4",  delay: 0.24 },
+                            { movie: trendingMovies[3], rotate: "rotate-5", translate: "translate-y-4", delay: 0.24 },
                         ].map(({ movie, rotate, translate, delay }) => (
                             <motion.img
                                 key={movie.id}
@@ -281,7 +340,7 @@ export default function Discover() {
                         <TrendingUp className="h-5 w-5 text-primary" />
                         <h2 className="text-xl font-bold">Trending This Week</h2>
                     </div>
-                    <motion.div 
+                    <motion.div
                         variants={containerVariants}
                         initial="hidden"
                         animate="show"
@@ -345,35 +404,108 @@ export default function Discover() {
                 {/* Genre Dropdown */}
                 <div className="flex flex-col gap-1.5">
                     <span className="text-xs font-medium text-muted-foreground ml-1">Genre</span>
-                    <div className="flex items-center gap-2">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="h-10 rounded-xl border-primary/20 bg-primary/5 px-4 transition-all hover:bg-primary/10">
-                                    <LucideSlidersHorizontal className="mr-2 h-4 w-4 text-primary" />
-                                    {selectedGenre ? GENRE_LIST.find((g) => g.id === selectedGenre)?.name : "All Genres"}
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="no-scrollbar max-h-80 overflow-y-auto rounded-xl">
-                                <DropdownMenuRadioGroup value={String(selectedGenre)} onValueChange={(v) => handleGenreClick(Number(v))}>
-                                    <DropdownMenuRadioItem value="null" className="rounded-lg">All Genres</DropdownMenuRadioItem>
-                                    <DropdownMenuSeparator />
-                                    {GENRE_LIST.map((genre) => (
-                                        <DropdownMenuRadioItem key={genre.id} value={String(genre.id)} className="rounded-lg">
-                                            {genre.name}
-                                        </DropdownMenuRadioItem>
-                                    ))}
-                                </DropdownMenuRadioGroup>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        {selectedGenre && (
-                            <Button variant="ghost" size="sm" onClick={() => setSelectedGenre(null)} className="h-10 rounded-xl text-muted-foreground hover:text-destructive transition-colors">
-                                <X className="mr-1 h-4 w-4" />
-                                Clear
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-10 rounded-xl border-primary/20 bg-primary/5 px-4 transition-all hover:bg-primary/10">
+                                <LucideSlidersHorizontal className="mr-2 h-4 w-4 text-primary" />
+                                {selectedGenre ? GENRE_LIST.find((g) => g.id === selectedGenre)?.name : "All Genres"}
                             </Button>
-                        )}
-                    </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="no-scrollbar max-h-80 overflow-y-auto rounded-xl">
+                            <DropdownMenuRadioGroup value={String(selectedGenre)} onValueChange={(v) => handleGenreClick(Number(v))}>
+                                <DropdownMenuRadioItem value="null" className="rounded-lg">All Genres</DropdownMenuRadioItem>
+                                <DropdownMenuSeparator />
+                                {GENRE_LIST.map((genre) => (
+                                    <DropdownMenuRadioItem key={genre.id} value={String(genre.id)} className="rounded-lg">
+                                        {genre.name}
+                                    </DropdownMenuRadioItem>
+                                ))}
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
+
+                {/* Provider Dropdown */}
+                <div className="flex flex-col gap-1.5">
+                    <span className="text-xs font-medium text-muted-foreground ml-1">Platform</span>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-10 rounded-xl border-primary/20 bg-primary/5 px-4 transition-all hover:bg-primary/10">
+                                <Tv className="mr-2 h-4 w-4 text-primary" />
+                                {selectedProvider ? WATCH_PROVIDERS.find((p) => p.id === selectedProvider)?.name : "All Platforms"}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="no-scrollbar max-h-80 overflow-y-auto rounded-xl">
+                            <DropdownMenuRadioGroup value={String(selectedProvider)} onValueChange={(v) => setSelectedProvider(v === "null" ? null : Number(v))}>
+                                <DropdownMenuRadioItem value="null" className="rounded-lg">All Platforms</DropdownMenuRadioItem>
+                                <DropdownMenuSeparator />
+                                {WATCH_PROVIDERS.map((provider) => (
+                                    <DropdownMenuRadioItem key={provider.id} value={String(provider.id)} className="rounded-lg">
+                                        {provider.name}
+                                    </DropdownMenuRadioItem>
+                                ))}
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+
+                {/* Language Dropdown */}
+                <div className="flex flex-col gap-1.5">
+                    <span className="text-xs font-medium text-muted-foreground ml-1">Language</span>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-10 rounded-xl border-primary/20 bg-primary/5 px-4 transition-all hover:bg-primary/10">
+                                <Languages className="mr-2 h-4 w-4 text-primary" />
+                                {selectedLanguage ? LANGUAGES.find((l) => l.code === selectedLanguage)?.name : "All Languages"}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="no-scrollbar max-h-80 overflow-y-auto rounded-xl">
+                            <DropdownMenuRadioGroup value={selectedLanguage || "null"} onValueChange={(v) => setSelectedLanguage(v === "null" ? null : v)}>
+                                <DropdownMenuRadioItem value="null" className="rounded-lg">All Languages</DropdownMenuRadioItem>
+                                <DropdownMenuSeparator />
+                                {LANGUAGES.map((lang) => (
+                                    <DropdownMenuRadioItem key={lang.code} value={lang.code} className="rounded-lg">
+                                        {lang.name}
+                                    </DropdownMenuRadioItem>
+                                ))}
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+
+                {/* Region Dropdown */}
+                <div className="flex flex-col gap-1.5">
+                    <span className="text-xs font-medium text-muted-foreground ml-1">Region</span>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-10 rounded-xl border-primary/20 bg-primary/5 px-4 transition-all hover:bg-primary/10">
+                                <Globe className="mr-2 h-4 w-4 text-primary" />
+                                {selectedRegion ? REGIONS.find((r) => r.code === selectedRegion)?.name : "All Regions"}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="no-scrollbar max-h-80 overflow-y-auto rounded-xl">
+                            <DropdownMenuRadioGroup value={selectedRegion || "null"} onValueChange={(v) => setSelectedRegion(v === "null" ? null : v)}>
+                                <DropdownMenuRadioItem value="null" className="rounded-lg">All Regions</DropdownMenuRadioItem>
+                                <DropdownMenuSeparator />
+                                {REGIONS.map((region) => (
+                                    <DropdownMenuRadioItem key={region.code} value={region.code} className="rounded-lg">
+                                        {region.name}
+                                    </DropdownMenuRadioItem>
+                                ))}
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+
+                {/* Clear Filters */}
+                {(selectedGenre || selectedProvider || selectedLanguage || selectedRegion) && (
+                    <div className="flex flex-col justify-end">
+                        <Button variant="ghost" size="sm" onClick={() => { setSelectedGenre(null); setSelectedProvider(null); setSelectedLanguage(null); setSelectedRegion(null); }} className="h-10 rounded-xl text-muted-foreground hover:text-destructive transition-colors">
+                            <X className="mr-1 h-4 w-4" />
+                            Clear Filters
+                        </Button>
+                    </div>
+                )}
             </div>
 
             {/* Results Grid */}
@@ -390,7 +522,7 @@ export default function Discover() {
                 </div>
 
                 <AnimatePresence mode="popLayout">
-                    <motion.div 
+                    <motion.div
                         key={`${sortBy}-${selectedGenre}`}
                         variants={containerVariants}
                         initial="hidden"
@@ -425,13 +557,13 @@ export default function Discover() {
                                 </div>
                             </motion.div>
                         ))}
-                        
+
                         {/* Skeletons */}
                         {loading && Array.from({ length: 12 }).map((_, i) => (
-                            <motion.div 
-                                key={`skel-${i}`} 
+                            <motion.div
+                                key={`skel-${i}`}
                                 variants={itemVariants}
-                                className="aspect-[2/3] animate-pulse rounded-xl bg-secondary" 
+                                className="aspect-[2/3] animate-pulse rounded-xl bg-secondary"
                             />
                         ))}
                     </motion.div>
